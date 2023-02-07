@@ -32,6 +32,7 @@
     "nuxt": "^3.1.2"
   },
   "dependencies": {
+    "@nuxtjs/robots": "^3.0.0",
     "nuxt-vitest": "^0.6.5"
   }
 }
