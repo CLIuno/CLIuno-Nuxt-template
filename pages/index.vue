@@ -1,15 +1,21 @@
 <template>
-    <div>
-        <h1>Hello </h1>
-    </div>
+  <div>
+    <button @click="count++">Count is: {{ count }}</button>
+  </div>
 </template>
 
 <script>
 export default {
-
+  data() {
+    return {
+      count: 0
+    }
+  }
 }
 </script>
 
-<style>
-
+<style scoped>
+button {
+  font-weight: bold;
+}
 </style>
