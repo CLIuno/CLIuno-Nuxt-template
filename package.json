@@ -1,32 +1,37 @@
 {
   "name": "cliuno-nuxt-template",
   "version": "2.0.1",
-  "author": "ru44",
-  "license": "AGPL-3.0-only",
+  "private": true,
   "keywords": [
     "cliuno",
+    "javascript",
     "nuxt",
-    "typescript",
-    "javascript"
+    "typescript"
   ],
-  "private": true,
+  "license": "AGPL-3.0-only",
+  "author": "ru44",
   "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --port 5000",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "lint": "eslint",
-    "lint:fix": "eslint . --fix",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
+    "format": "oxfmt .",
     "postinstall": "nuxt prepare",
     "prepare": "husky"
   },
   "dependencies": {
-    "@nuxt/eslint": "0.7.4",
-    "eslint": "^8.57.0 || ^9.0.0",
-    "nuxt": "^3.15.0",
-    "vue": "latest",
-    "vue-router": "latest"
+    "@iconify/vue": "^5.0.0",
+    "@pinia/nuxt": "^0.11.3",
+    "@tailwindcss/vite": "^4.2.2",
+    "axios": "^1.14.0",
+    "daisyui": "^5.5.19",
+    "nuxt": "^4.4.2",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.0",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.11",
@@ -35,9 +40,12 @@
     "autoprefixer": "^10.4.20",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.11",
+    "oxfmt": "^0.44.0",
+    "oxlint": "^1.59.0",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.7.2"
-  }
+  },
+  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
 }

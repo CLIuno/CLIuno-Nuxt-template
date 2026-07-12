@@ -1,7 +1,13 @@
+<script setup lang="ts">
+const authStore = useAuthStore()
+
+onMounted(async () => {
+  if (authStore.token) {
+    await authStore.fetchCurrentUser()
+  }
+})
+</script>
+
 <template>
-  <div>
-    <h1 class="text-3xl font-bold underline">
-    Cliuno Nuxt Template
-  </h1>
-  </div>
+  <NuxtPage />
 </template>
