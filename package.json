@@ -47,7 +47,7 @@
     "lint-staged": "^15.2.11",
     "oxfmt": "^0.44.0",
     "oxlint": "^1.59.0",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.19",
     "prettier": "^3.4.2",
     "shadcn-nuxt": "^2.7.4",
     "tailwindcss": "^4.2.2",
