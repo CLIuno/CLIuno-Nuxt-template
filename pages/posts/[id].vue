@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import {
+  ArrowLeftIcon,
+  Loader2Icon,
+  MessageSquareIcon,
+  PencilIcon,
+  SendIcon,
+  Trash2Icon,
+  UserIcon,
+} from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -116,169 +124,173 @@ onMounted(fetchPost)
 </script>
 
 <template>
-  <div class="tw:max-w-3xl tw:mx-auto tw:px-4 tw:py-8">
+  <div class="mx-auto max-w-3xl px-4 py-8">
     <!-- Back -->
-    <NuxtLink to="/posts" class="tw:btn tw:btn-ghost tw:btn-sm tw:mb-6">
-      <Icon icon="mdi:arrow-left" class="tw:w-5 tw:h-5" />
-      Back to Posts
-    </NuxtLink>
+    <Button variant="ghost" size="sm" class="mb-6" as-child>
+      <NuxtLink to="/posts">
+        <ArrowLeftIcon class="size-4" />
+        Back to Posts
+      </NuxtLink>
+    </Button>
 
     <!-- Loading -->
-    <div v-if="loading" class="tw:flex tw:justify-center tw:py-20">
-      <span class="tw:loading tw:loading-spinner tw:loading-lg tw:text-primary" />
+    <div v-if="loading" class="flex justify-center py-20">
+      <Loader2Icon class="size-8 animate-spin text-muted-foreground" />
     </div>
 
     <template v-else-if="post">
       <!-- Detail Card -->
-      <div class="tw:card tw:bg-base-100 tw:shadow-lg tw:mb-6">
-        <div class="tw:card-body">
+      <Card class="mb-6">
+        <CardContent>
           <template v-if="!editing">
-            <div class="tw:flex tw:items-start tw:justify-between">
+            <div class="flex items-start justify-between gap-4">
               <div>
-                <h1 class="tw:text-2xl tw:font-bold">
+                <h1 class="text-2xl font-bold">
                   {{ post.title }}
                 </h1>
-                <p v-if="post.content" class="tw:mt-3 tw:text-base-content/70">
+                <p v-if="post.content" class="mt-3 text-muted-foreground">
                   {{ post.content }}
                 </p>
               </div>
-              <div v-if="post.user.id === authStore.user?.id" class="tw:flex tw:gap-2">
-                <button class="tw:btn tw:btn-sm tw:btn-outline" @click="startEdit">
-                  <Icon icon="mdi:pencil" class="tw:w-4 tw:h-4" />
-                </button>
+              <div v-if="post.user.id === authStore.user?.id" class="flex shrink-0 gap-2">
+                <Button variant="outline" size="icon-sm" aria-label="Edit post" @click="startEdit">
+                  <PencilIcon class="size-4" />
+                </Button>
               </div>
             </div>
           </template>
 
           <!-- Edit Mode -->
-          <template v-else>
-            <form class="tw:space-y-4" @submit.prevent="saveEdit">
-              <input
+          <form v-else class="space-y-4" @submit.prevent="saveEdit">
+            <div class="space-y-2">
+              <Label for="post-edit-title">Title</Label>
+              <Input
+                id="post-edit-title"
                 v-model="editTitle"
                 type="text"
-                class="tw:input tw:input-bordered tw:w-full tw:text-xl tw:font-bold"
+                class="text-xl font-bold"
               />
-              <textarea
-                v-model="editContent"
-                class="tw:textarea tw:textarea-bordered tw:w-full"
-                rows="5"
-              />
-              <div class="tw:flex tw:gap-2 tw:justify-end">
-                <button type="button" class="tw:btn tw:btn-sm" @click="editing = false">
-                  Cancel
-                </button>
-                <button type="submit" class="tw:btn tw:btn-sm tw:btn-primary">Save</button>
-              </div>
-            </form>
-          </template>
+            </div>
+            <div class="space-y-2">
+              <Label for="post-edit-content">Content</Label>
+              <Textarea id="post-edit-content" v-model="editContent" :rows="5" />
+            </div>
+            <div class="flex justify-end gap-2">
+              <Button type="button" variant="outline" size="sm" @click="editing = false">
+                Cancel
+              </Button>
+              <Button type="submit" size="sm">Save</Button>
+            </div>
+          </form>
 
           <!-- Meta -->
-          <div
-            class="tw:flex tw:items-center tw:gap-4 tw:mt-4 tw:pt-4 tw:border-t tw:border-base-200 tw:text-sm tw:text-base-content/50"
-          >
+          <div class="mt-4 flex items-center gap-4 border-t pt-4 text-sm text-muted-foreground">
             <NuxtLink
               :to="`/users/${post.user.id}`"
-              class="tw:flex tw:items-center tw:gap-1 hover:tw:text-primary"
+              class="flex items-center gap-1 hover:text-foreground"
             >
-              <Icon icon="mdi:account" class="tw:w-4 tw:h-4" />
+              <UserIcon class="size-4" />
               {{ post.user.first_name }} {{ post.user.last_name }} (@{{ post.user.username }})
             </NuxtLink>
             <span>{{ timeAgo(post.createdAt) }}</span>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       <!-- Comments Section -->
-      <div class="tw:card tw:bg-base-100 tw:shadow-lg">
-        <div class="tw:card-body">
-          <h2 class="tw:text-xl tw:font-bold tw:mb-4">
-            <Icon icon="mdi:comment-multiple-outline" class="tw:w-6 tw:h-6 tw:inline tw:mr-1" />
+      <Card>
+        <CardContent>
+          <h2 class="mb-4 flex items-center gap-2 text-xl font-bold">
+            <MessageSquareIcon class="size-5" />
             Comments ({{ post.comments?.length || 0 }})
           </h2>
 
           <!-- Add Comment -->
-          <form class="tw:mb-6" @submit.prevent="addComment">
-            <div class="tw:flex tw:gap-2">
-              <input
-                v-model="newComment"
-                type="text"
-                placeholder="Write a comment..."
-                class="tw:input tw:input-bordered tw:flex-1"
-                required
-              />
-              <button type="submit" class="tw:btn tw:btn-primary" :disabled="submittingComment">
-                <Icon icon="mdi:send" class="tw:w-5 tw:h-5" />
-              </button>
-            </div>
+          <form class="mb-6 flex gap-2" @submit.prevent="addComment">
+            <Input
+              v-model="newComment"
+              type="text"
+              placeholder="Write a comment..."
+              aria-label="Write a comment"
+              required
+            />
+            <Button
+              type="submit"
+              size="icon"
+              :disabled="submittingComment"
+              aria-label="Send comment"
+            >
+              <Loader2Icon v-if="submittingComment" class="size-4 animate-spin" />
+              <SendIcon v-else class="size-4" />
+            </Button>
           </form>
 
+          <Separator v-if="post.comments?.length" class="mb-4" />
+
           <!-- Comments List -->
-          <div v-if="!post.comments?.length" class="tw:text-center tw:py-8 tw:text-base-content/40">
-            <Icon icon="mdi:comment-off-outline" class="tw:w-10 tw:h-10 tw:mx-auto tw:mb-2" />
+          <div v-if="!post.comments?.length" class="py-8 text-center text-muted-foreground/60">
+            <MessageSquareIcon class="mx-auto mb-2 size-10" />
             <p>No comments yet. Be the first!</p>
           </div>
 
-          <div v-else class="tw:space-y-4">
-            <div v-for="comment in post.comments" :key="comment.id" class="tw:flex tw:gap-3">
-              <div class="tw:avatar tw:placeholder">
-                <div class="tw:bg-neutral tw:text-neutral-content tw:w-8 tw:h-8 tw:rounded-full">
-                  <span class="tw:text-xs"
-                    >{{ comment.user.first_name[0] }}{{ comment.user.last_name[0] }}</span
-                  >
-                </div>
-              </div>
-              <div class="tw:flex-1 tw:bg-base-200 tw:rounded-lg tw:p-3">
-                <div class="tw:flex tw:items-center tw:justify-between tw:mb-1">
+          <div v-else class="space-y-4">
+            <div v-for="comment in post.comments" :key="comment.id" class="flex gap-3">
+              <Avatar size="sm">
+                <AvatarFallback
+                  >{{ comment.user.first_name[0] }}{{ comment.user.last_name[0] }}</AvatarFallback
+                >
+              </Avatar>
+              <div class="flex-1 rounded-lg bg-muted p-3">
+                <div class="mb-1 flex items-center justify-between">
                   <NuxtLink
                     :to="`/users/${comment.user.id}`"
-                    class="tw:font-semibold tw:text-sm hover:tw:text-primary"
+                    class="text-sm font-semibold hover:text-foreground"
                   >
                     {{ comment.user.username }}
                   </NuxtLink>
-                  <div class="tw:flex tw:items-center tw:gap-2">
-                    <span class="tw:text-xs tw:text-base-content/50">{{
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs text-muted-foreground">{{
                       timeAgo(comment.createdAt)
                     }}</span>
                     <template v-if="comment.user.id === authStore.user?.id">
-                      <button
-                        class="tw:btn tw:btn-ghost tw:btn-xs"
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        aria-label="Edit comment"
                         @click="startEditComment(comment)"
                       >
-                        <Icon icon="mdi:pencil" class="tw:w-3 tw:h-3" />
-                      </button>
-                      <button
-                        class="tw:btn tw:btn-ghost tw:btn-xs tw:text-error"
+                        <PencilIcon class="size-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        class="text-muted-foreground hover:text-destructive"
+                        aria-label="Delete comment"
                         @click="deleteComment(comment.id)"
                       >
-                        <Icon icon="mdi:delete" class="tw:w-3 tw:h-3" />
-                      </button>
+                        <Trash2Icon class="size-3" />
+                      </Button>
                     </template>
                   </div>
                 </div>
 
-                <template v-if="editingCommentId === comment.id">
-                  <div class="tw:flex tw:gap-2">
-                    <input
-                      v-model="editCommentContent"
-                      class="tw:input tw:input-sm tw:input-bordered tw:flex-1"
-                    />
-                    <button
-                      class="tw:btn tw:btn-sm tw:btn-primary"
-                      @click="saveEditComment(comment.id)"
-                    >
-                      Save
-                    </button>
-                    <button class="tw:btn tw:btn-sm" @click="editingCommentId = null">
-                      Cancel
-                    </button>
-                  </div>
-                </template>
-                <p v-else class="tw:text-sm">{{ comment.content }}</p>
+                <div v-if="editingCommentId === comment.id" class="flex gap-2">
+                  <Input
+                    v-model="editCommentContent"
+                    class="h-8 flex-1 text-sm"
+                    aria-label="Edit comment"
+                  />
+                  <Button size="sm" @click="saveEditComment(comment.id)">Save</Button>
+                  <Button variant="outline" size="sm" @click="editingCommentId = null">
+                    Cancel
+                  </Button>
+                </div>
+                <p v-else class="text-sm">{{ comment.content }}</p>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </template>
   </div>
 </template>

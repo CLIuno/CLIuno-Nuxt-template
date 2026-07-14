@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Loader2Icon, UserCheckIcon, UserPlusIcon, UsersIcon } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -57,63 +57,49 @@ onMounted(fetchUsers)
 </script>
 
 <template>
-  <div class="tw:max-w-4xl tw:mx-auto tw:px-4 tw:py-8">
-    <div class="tw:mb-8">
-      <h1 class="tw:text-3xl tw:font-bold tw:text-base-content">Users</h1>
-      <p class="tw:text-base-content/60">Discover and follow other users</p>
+  <div class="mx-auto max-w-4xl px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold">Users</h1>
+      <p class="text-muted-foreground">Discover and follow other users</p>
     </div>
 
-    <div v-if="loading" class="tw:flex tw:justify-center tw:py-20">
-      <span class="tw:loading tw:loading-spinner tw:loading-lg tw:text-primary" />
+    <div v-if="loading" class="flex justify-center py-20">
+      <Loader2Icon class="size-8 animate-spin text-muted-foreground" />
     </div>
 
-    <div v-else-if="users.length === 0" class="tw:text-center tw:py-20">
-      <Icon
-        icon="mdi:account-group-outline"
-        class="tw:w-16 tw:h-16 tw:mx-auto tw:text-base-content/30"
-      />
-      <h3 class="tw:text-xl tw:font-semibold tw:mt-4">No other users yet</h3>
+    <div v-else-if="users.length === 0" class="py-20 text-center">
+      <UsersIcon class="mx-auto size-16 text-muted-foreground/40" />
+      <h3 class="mt-4 text-xl font-semibold">No other users yet</h3>
     </div>
 
-    <div v-else class="tw:grid tw:grid-cols-1 md:tw:grid-cols-2 tw:gap-4">
-      <div
-        v-for="user in users"
-        :key="user.id"
-        class="tw:card tw:bg-base-100 tw:shadow-sm hover:tw:shadow-md tw:transition-shadow"
-      >
-        <div class="tw:card-body tw:p-4 tw:flex tw:flex-row tw:items-center tw:gap-4">
-          <!-- Avatar -->
-          <div class="tw:avatar tw:placeholder">
-            <div class="tw:bg-primary tw:text-primary-content tw:w-12 tw:h-12 tw:rounded-full">
-              <span class="tw:text-lg">{{ user.first_name[0] }}{{ user.last_name[0] }}</span>
-            </div>
-          </div>
+    <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <Card v-for="user in users" :key="user.id" class="py-4">
+        <CardContent class="flex flex-row items-center gap-4 px-4">
+          <Avatar size="lg">
+            <AvatarFallback>{{ user.first_name[0] }}{{ user.last_name[0] }}</AvatarFallback>
+          </Avatar>
 
-          <!-- Info -->
-          <div class="tw:flex-1">
+          <div class="min-w-0 flex-1">
             <NuxtLink
               :to="`/users/${user.id}`"
-              class="tw:font-semibold hover:tw:text-primary tw:transition-colors"
+              class="font-semibold transition-colors hover:text-muted-foreground"
             >
               {{ user.first_name }} {{ user.last_name }}
             </NuxtLink>
-            <p class="tw:text-sm tw:text-base-content/50">@{{ user.username }}</p>
+            <p class="text-sm text-muted-foreground">@{{ user.username }}</p>
           </div>
 
-          <!-- Follow Button -->
-          <button
-            class="tw:btn tw:btn-sm"
-            :class="followingMap[user.id] ? 'tw:btn-outline' : 'tw:btn-primary'"
+          <Button
+            size="sm"
+            :variant="followingMap[user.id] ? 'outline' : 'default'"
             @click="toggleFollow(user.id)"
           >
-            <Icon
-              :icon="followingMap[user.id] ? 'mdi:account-check' : 'mdi:account-plus'"
-              class="tw:w-4 tw:h-4"
-            />
+            <UserCheckIcon v-if="followingMap[user.id]" class="size-4" />
+            <UserPlusIcon v-else class="size-4" />
             {{ followingMap[user.id] ? 'Following' : 'Follow' }}
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   </div>
 </template>

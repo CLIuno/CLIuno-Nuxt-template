@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { CircleAlertIcon, EyeIcon, EyeOffIcon, Loader2Icon, RocketIcon } from '@lucide/vue'
 
 definePageMeta({ layout: false, middleware: 'guest' })
 
@@ -40,167 +40,141 @@ async function handleRegister() {
 
 <template>
   <div
-    class="tw:min-h-screen tw:flex tw:items-center tw:justify-center tw:bg-base-200 tw:px-4 tw:py-8"
+    class="flex min-h-screen items-center justify-center bg-background px-4 py-8 text-foreground"
   >
-    <div class="tw:card tw:w-full tw:max-w-lg tw:bg-base-100 tw:shadow-xl">
-      <div class="tw:card-body tw:p-8">
-        <!-- Logo -->
-        <div class="tw:flex tw:items-center tw:justify-center tw:gap-2 tw:mb-2">
-          <Icon icon="mdi:rocket-launch-outline" class="tw:w-8 tw:h-8 tw:text-primary" />
-          <span class="tw:text-2xl tw:font-bold tw:text-primary">CLIuno</span>
-        </div>
+    <Card class="w-full max-w-sm">
+      <CardHeader class="text-center">
+        <NuxtLink to="/" class="mb-2 flex items-center justify-center gap-2 font-bold">
+          <RocketIcon class="size-6" />
+          <span class="text-xl">CLIuno</span>
+        </NuxtLink>
+        <CardTitle class="text-xl">Create Account</CardTitle>
+        <CardDescription>Join the community</CardDescription>
+      </CardHeader>
 
-        <h2 class="tw:text-2xl tw:font-bold tw:text-center tw:mb-1">Create Account</h2>
-        <p class="tw:text-center tw:text-base-content/60 tw:mb-6">Join the community</p>
+      <CardContent class="space-y-4">
+        <Alert v-if="authStore.error" variant="destructive">
+          <CircleAlertIcon />
+          <AlertTitle>{{ authStore.error }}</AlertTitle>
+        </Alert>
 
-        <!-- Error Alert -->
-        <div v-if="authStore.error" class="tw:alert tw:alert-error tw:mb-4">
-          <Icon icon="mdi:alert-circle" class="tw:w-5 tw:h-5" />
-          <span>{{ authStore.error }}</span>
-        </div>
-
-        <form class="tw:space-y-4" @submit.prevent="handleRegister">
-          <!-- Name Row -->
-          <div class="tw:grid tw:grid-cols-2 tw:gap-4">
-            <fieldset class="tw:fieldset">
-              <legend class="tw:fieldset-legend">First Name</legend>
-              <input
+        <form class="space-y-4" @submit.prevent="handleRegister">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <Label for="reg-first-name">First Name</Label>
+              <Input
+                id="reg-first-name"
                 v-model="form.first_name"
                 type="text"
                 placeholder="John"
-                class="tw:input tw:w-full"
                 required
               />
-            </fieldset>
-            <fieldset class="tw:fieldset">
-              <legend class="tw:fieldset-legend">Last Name</legend>
-              <input
+            </div>
+            <div class="space-y-2">
+              <Label for="reg-last-name">Last Name</Label>
+              <Input
+                id="reg-last-name"
                 v-model="form.last_name"
                 type="text"
                 placeholder="Doe"
-                class="tw:input tw:w-full"
                 required
               />
-            </fieldset>
+            </div>
           </div>
 
-          <!-- Username -->
-          <fieldset class="tw:fieldset">
-            <legend class="tw:fieldset-legend">Username</legend>
-            <div class="tw:input tw:w-full">
-              <Icon icon="mdi:at" class="tw:h-[1em] tw:opacity-50" />
-              <input
-                id="reg-username"
-                v-model="form.username"
-                type="text"
-                placeholder="johndoe"
-                class="tw:grow"
-                required
-              />
-            </div>
-          </fieldset>
+          <div class="space-y-2">
+            <Label for="reg-username">Username</Label>
+            <Input
+              id="reg-username"
+              v-model="form.username"
+              type="text"
+              placeholder="johndoe"
+              required
+            />
+          </div>
 
-          <!-- Email -->
-          <fieldset class="tw:fieldset">
-            <legend class="tw:fieldset-legend">Email</legend>
-            <div class="tw:input tw:w-full">
-              <Icon icon="mdi:email-outline" class="tw:h-[1em] tw:opacity-50" />
-              <input
-                id="reg-email"
-                v-model="form.email"
-                type="email"
-                placeholder="john@example.com"
-                class="tw:grow"
-                required
-              />
-            </div>
-          </fieldset>
+          <div class="space-y-2">
+            <Label for="reg-email">Email</Label>
+            <Input
+              id="reg-email"
+              v-model="form.email"
+              type="email"
+              placeholder="john@example.com"
+              required
+            />
+          </div>
 
-          <!-- Phone -->
-          <fieldset class="tw:fieldset">
-            <legend class="tw:fieldset-legend">Phone</legend>
-            <div class="tw:input tw:w-full">
-              <Icon icon="mdi:phone-outline" class="tw:h-[1em] tw:opacity-50" />
-              <input
-                id="reg-phone"
-                v-model="form.phone"
-                type="tel"
-                placeholder="+966512345678"
-                class="tw:grow"
-                required
-              />
-            </div>
-          </fieldset>
+          <div class="space-y-2">
+            <Label for="reg-phone">Phone</Label>
+            <Input
+              id="reg-phone"
+              v-model="form.phone"
+              type="tel"
+              placeholder="+966512345678"
+              required
+            />
+          </div>
 
-          <!-- Password -->
-          <fieldset class="tw:fieldset">
-            <legend class="tw:fieldset-legend">Password</legend>
-            <div class="tw:input tw:w-full">
-              <Icon icon="mdi:lock-outline" class="tw:h-[1em] tw:opacity-50" />
-              <input
+          <div class="space-y-2">
+            <Label for="reg-password">Password</Label>
+            <div class="relative">
+              <Input
                 id="reg-password"
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Min 8 characters"
-                class="tw:grow"
+                class="pr-9"
                 required
                 minlength="8"
               />
-              <button
+              <Button
                 type="button"
-                class="tw:btn tw:btn-ghost tw:btn-xs tw:btn-circle"
-                @click.prevent="showPassword = !showPassword"
+                variant="ghost"
+                size="icon-xs"
+                class="absolute top-1/2 right-1.5 -translate-y-1/2 text-muted-foreground"
+                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                @click="showPassword = !showPassword"
               >
-                <Icon :icon="showPassword ? 'mdi:eye-off' : 'mdi:eye'" class="tw:w-4 tw:h-4" />
-              </button>
+                <EyeOffIcon v-if="showPassword" class="size-4" />
+                <EyeIcon v-else class="size-4" />
+              </Button>
             </div>
-          </fieldset>
+          </div>
 
-          <!-- Confirm Password -->
-          <fieldset class="tw:fieldset">
-            <legend class="tw:fieldset-legend">Confirm Password</legend>
-            <div
-              class="tw:input tw:w-full"
-              :class="{
-                'tw:input-error': form.password_confirmation && !passwordsMatch,
-              }"
+          <div class="space-y-2">
+            <Label for="reg-password-confirm">Confirm Password</Label>
+            <Input
+              id="reg-password-confirm"
+              v-model="form.password_confirmation"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="Confirm your password"
+              :aria-invalid="Boolean(form.password_confirmation && !passwordsMatch)"
+              required
+            />
+            <p
+              v-if="form.password_confirmation && !passwordsMatch"
+              class="text-sm text-destructive"
             >
-              <Icon icon="mdi:lock-check-outline" class="tw:h-[1em] tw:opacity-50" />
-              <input
-                id="reg-password-confirm"
-                v-model="form.password_confirmation"
-                :type="showPassword ? 'text' : 'password'"
-                placeholder="Confirm your password"
-                class="tw:grow"
-                required
-              />
-            </div>
-            <p v-if="form.password_confirmation && !passwordsMatch" class="tw:label tw:text-error">
               Passwords do not match
             </p>
-          </fieldset>
+          </div>
 
-          <!-- Submit -->
-          <button
-            type="submit"
-            class="tw:btn tw:btn-primary tw:w-full"
-            :class="{ 'tw:loading': authStore.loading }"
-            :disabled="authStore.loading || !isFormValid"
-          >
-            <Icon v-if="!authStore.loading" icon="mdi:account-plus-outline" class="tw:w-5 tw:h-5" />
+          <Button type="submit" class="w-full" :disabled="authStore.loading || !isFormValid">
+            <Loader2Icon v-if="authStore.loading" class="size-4 animate-spin" />
             {{ authStore.loading ? 'Creating account...' : 'Create Account' }}
-          </button>
+          </Button>
         </form>
+      </CardContent>
 
-        <!-- Divider -->
-        <div class="tw:divider tw:text-sm">Already have an account?</div>
-
-        <!-- Login Link -->
-        <NuxtLink to="/login" class="tw:btn tw:btn-outline tw:w-full">
-          <Icon icon="mdi:login" class="tw:w-5 tw:h-5" />
-          Sign In
+      <CardFooter class="justify-center text-sm text-muted-foreground">
+        Already have an account?
+        <NuxtLink
+          to="/login"
+          class="ml-1 font-medium text-foreground underline-offset-4 hover:underline"
+        >
+          Sign in
         </NuxtLink>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   </div>
 </template>

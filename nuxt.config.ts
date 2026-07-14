@@ -4,13 +4,17 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
 
-  modules: ['@pinia/nuxt'],
+  modules: ['@pinia/nuxt', 'shadcn-nuxt'],
+
+  shadcn: {
+    /** Prefix for all the imported components */
+    prefix: '',
+    /** Directory that the components live in */
+    componentDir: './components/ui',
+  },
 
   vite: {
-    plugins: [
-      // @ts-expect-error - tailwindcss vite plugin typing
-      (await import('@tailwindcss/vite')).default(),
-    ],
+    plugins: [(await import('@tailwindcss/vite')).default()],
   },
 
   runtimeConfig: {

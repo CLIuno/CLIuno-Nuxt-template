@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { ClipboardCheckIcon, Loader2Icon, PlusIcon, Trash2Icon, UserIcon } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -23,6 +23,13 @@ const newTitle = ref('')
 const newDescription = ref('')
 const creating = ref(false)
 const filter = ref<'all' | 'mine' | 'active' | 'completed'>('all')
+
+const filters = [
+  { value: 'all', label: 'All' },
+  { value: 'mine', label: 'Mine' },
+  { value: 'active', label: 'Active' },
+  { value: 'completed', label: 'Completed' },
+] as const
 
 const filteredTodos = computed(() => {
   let result = todos.value
@@ -83,189 +90,139 @@ onMounted(fetchTodos)
 </script>
 
 <template>
-  <div class="tw:max-w-4xl tw:mx-auto tw:px-4 tw:py-8">
+  <div class="mx-auto max-w-4xl px-4 py-8">
     <!-- Header -->
-    <div class="tw:flex tw:items-center tw:justify-between tw:mb-8">
+    <div class="mb-8 flex items-center justify-between gap-4">
       <div>
-        <h1 class="tw:text-3xl tw:font-bold tw:text-base-content">Todos</h1>
-        <p class="tw:text-base-content/60">Manage your tasks and collaborate with others</p>
+        <h1 class="text-3xl font-bold">Todos</h1>
+        <p class="text-muted-foreground">Manage your tasks and collaborate with others</p>
       </div>
-      <button class="tw:btn tw:btn-primary" @click="showCreateModal = true">
-        <Icon icon="mdi:plus" class="tw:w-5 tw:h-5" />
+      <Button @click="showCreateModal = true">
+        <PlusIcon class="size-4" />
         New Todo
-      </button>
+      </Button>
     </div>
 
     <!-- Filters -->
-    <div class="tw:tabs tw:tabs-boxed tw:mb-6 tw:w-fit">
-      <button class="tw:tab" :class="{ 'tw:tab-active': filter === 'all' }" @click="filter = 'all'">
-        All
-      </button>
+    <div class="mb-6 inline-flex w-fit items-center gap-1 rounded-lg bg-muted p-1">
       <button
-        class="tw:tab"
-        :class="{ 'tw:tab-active': filter === 'mine' }"
-        @click="filter = 'mine'"
+        v-for="f in filters"
+        :key="f.value"
+        type="button"
+        class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+        :class="
+          filter === f.value
+            ? 'bg-background text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground'
+        "
+        @click="filter = f.value"
       >
-        Mine
-      </button>
-      <button
-        class="tw:tab"
-        :class="{ 'tw:tab-active': filter === 'active' }"
-        @click="filter = 'active'"
-      >
-        Active
-      </button>
-      <button
-        class="tw:tab"
-        :class="{ 'tw:tab-active': filter === 'completed' }"
-        @click="filter = 'completed'"
-      >
-        Completed
+        {{ f.label }}
       </button>
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="tw:flex tw:justify-center tw:py-20">
-      <span class="tw:loading tw:loading-spinner tw:loading-lg tw:text-primary" />
+    <div v-if="loading" class="flex justify-center py-20">
+      <Loader2Icon class="size-8 animate-spin text-muted-foreground" />
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="filteredTodos.length === 0" class="tw:text-center tw:py-20">
-      <Icon
-        icon="mdi:clipboard-check-outline"
-        class="tw:w-16 tw:h-16 tw:mx-auto tw:text-base-content/30"
-      />
-      <h3 class="tw:text-xl tw:font-semibold tw:mt-4">No todos yet</h3>
-      <p class="tw:text-base-content/60 tw:mt-2">Create your first todo to get started!</p>
+    <div v-else-if="filteredTodos.length === 0" class="py-20 text-center">
+      <ClipboardCheckIcon class="mx-auto size-16 text-muted-foreground/40" />
+      <h3 class="mt-4 text-xl font-semibold">No todos yet</h3>
+      <p class="mt-2 text-muted-foreground">Create your first todo to get started!</p>
     </div>
 
     <!-- List -->
-    <div v-else class="tw:space-y-3">
-      <div
-        v-for="todo in filteredTodos"
-        :key="todo.id"
-        class="tw:card tw:bg-base-100 tw:shadow-sm hover:tw:shadow-md tw:transition-shadow"
-      >
-        <div class="tw:card-body tw:p-4">
-          <div class="tw:flex tw:items-start tw:gap-3">
-            <!-- Checkbox -->
-            <button
-              v-if="todo.user.id === authStore.user?.id"
-              class="tw:mt-1 tw:shrink-0"
-              @click="toggleTodo(todo.id)"
-            >
-              <Icon
-                :icon="
-                  todo.is_completed
-                    ? 'mdi:checkbox-marked-circle'
-                    : 'mdi:checkbox-blank-circle-outline'
-                "
-                class="tw:w-6 tw:h-6"
-                :class="todo.is_completed ? 'tw:text-success' : 'tw:text-base-content/30'"
-              />
-            </button>
-            <div v-else class="tw:mt-1 tw:shrink-0">
-              <Icon
-                :icon="
-                  todo.is_completed
-                    ? 'mdi:checkbox-marked-circle'
-                    : 'mdi:checkbox-blank-circle-outline'
-                "
-                class="tw:w-6 tw:h-6"
-                :class="todo.is_completed ? 'tw:text-success' : 'tw:text-base-content/30'"
-              />
-            </div>
+    <div v-else class="space-y-3">
+      <Card v-for="todo in filteredTodos" :key="todo.id" class="py-4">
+        <CardContent class="flex items-start gap-3 px-4">
+          <Checkbox
+            :model-value="todo.is_completed"
+            :disabled="todo.user.id !== authStore.user?.id"
+            :aria-label="todo.is_completed ? 'Mark as active' : 'Mark as completed'"
+            class="mt-1"
+            @update:model-value="toggleTodo(todo.id)"
+          />
 
-            <!-- Content -->
-            <div class="tw:flex-1 tw:min-w-0">
-              <NuxtLink :to="`/todos/${todo.id}`">
-                <h3
-                  class="tw:font-semibold tw:text-lg hover:tw:text-primary tw:transition-colors"
-                  :class="{ 'tw:line-through tw:opacity-60': todo.is_completed }"
-                >
-                  {{ todo.title }}
-                </h3>
+          <!-- Content -->
+          <div class="min-w-0 flex-1">
+            <NuxtLink :to="`/todos/${todo.id}`">
+              <h3
+                class="font-semibold transition-colors hover:text-muted-foreground"
+                :class="{ 'text-muted-foreground line-through': todo.is_completed }"
+              >
+                {{ todo.title }}
+              </h3>
+            </NuxtLink>
+            <p v-if="todo.description" class="mt-1 line-clamp-2 text-sm text-muted-foreground">
+              {{ todo.description }}
+            </p>
+            <div class="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+              <NuxtLink
+                :to="`/users/${todo.user.id}`"
+                class="flex items-center gap-1 hover:text-foreground"
+              >
+                <UserIcon class="size-4" />
+                @{{ todo.user.username }}
               </NuxtLink>
-              <p
-                v-if="todo.description"
-                class="tw:text-base-content/60 tw:text-sm tw:mt-1 tw:line-clamp-2"
-              >
-                {{ todo.description }}
-              </p>
-              <div
-                class="tw:flex tw:items-center tw:gap-4 tw:mt-2 tw:text-sm tw:text-base-content/50"
-              >
-                <NuxtLink
-                  :to="`/users/${todo.user.id}`"
-                  class="tw:flex tw:items-center tw:gap-1 hover:tw:text-primary"
-                >
-                  <Icon icon="mdi:account" class="tw:w-4 tw:h-4" />
-                  {{ todo.user.username }}
-                </NuxtLink>
-                <span>{{ timeAgo(todo.createdAt) }}</span>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div v-if="todo.user.id === authStore.user?.id" class="tw:dropdown tw:dropdown-end">
-              <button class="tw:btn tw:btn-ghost tw:btn-sm tw:btn-circle">
-                <Icon icon="mdi:dots-vertical" class="tw:w-5 tw:h-5" />
-              </button>
-              <ul
-                class="tw:dropdown-content tw:menu tw:p-2 tw:shadow tw:bg-base-100 tw:rounded-box tw:w-40 tw:z-10"
-              >
-                <li>
-                  <NuxtLink :to="`/todos/${todo.id}`">
-                    <Icon icon="mdi:eye" class="tw:w-4 tw:h-4" /> View
-                  </NuxtLink>
-                </li>
-                <li>
-                  <button class="tw:text-error" @click="deleteTodo(todo.id)">
-                    <Icon icon="mdi:delete" class="tw:w-4 tw:h-4" /> Delete
-                  </button>
-                </li>
-              </ul>
+              <span>{{ timeAgo(todo.createdAt) }}</span>
             </div>
           </div>
-        </div>
-      </div>
+
+          <!-- Actions -->
+          <Button
+            v-if="todo.user.id === authStore.user?.id"
+            variant="ghost"
+            size="icon-sm"
+            class="text-muted-foreground hover:text-destructive"
+            aria-label="Delete todo"
+            @click="deleteTodo(todo.id)"
+          >
+            <Trash2Icon class="size-4" />
+          </Button>
+        </CardContent>
+      </Card>
     </div>
 
-    <!-- Create Modal -->
-    <div v-if="showCreateModal" class="tw:modal tw:modal-open">
-      <div class="tw:modal-box">
-        <h3 class="tw:font-bold tw:text-lg tw:mb-4">Create New Todo</h3>
-        <form class="tw:space-y-4" @submit.prevent="createTodo">
-          <div class="tw:form-control">
-            <div class="tw:label"><span class="tw:label-text">Title</span></div>
-            <input
+    <!-- Create Dialog -->
+    <Dialog v-model:open="showCreateModal">
+      <DialogContent class="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Create New Todo</DialogTitle>
+          <DialogDescription>Add a task to your list.</DialogDescription>
+        </DialogHeader>
+        <form class="space-y-4" @submit.prevent="createTodo">
+          <div class="space-y-2">
+            <Label for="todo-title">Title</Label>
+            <Input
+              id="todo-title"
               v-model="newTitle"
               type="text"
               placeholder="What needs to be done?"
-              class="tw:input tw:input-bordered tw:w-full"
               required
             />
           </div>
-          <div class="tw:form-control">
-            <div class="tw:label">
-              <span class="tw:label-text">Description (optional)</span>
-            </div>
-            <textarea
+          <div class="space-y-2">
+            <Label for="todo-description">Description (optional)</Label>
+            <Textarea
+              id="todo-description"
               v-model="newDescription"
               placeholder="Add more details..."
-              class="tw:textarea tw:textarea-bordered tw:w-full"
-              rows="3"
+              :rows="3"
             />
           </div>
-          <div class="tw:modal-action">
-            <button type="button" class="tw:btn" @click="showCreateModal = false">Cancel</button>
-            <button type="submit" class="tw:btn tw:btn-primary" :disabled="creating">
+          <DialogFooter>
+            <Button type="button" variant="outline" @click="showCreateModal = false">
+              Cancel
+            </Button>
+            <Button type="submit" :disabled="creating">
+              <Loader2Icon v-if="creating" class="size-4 animate-spin" />
               {{ creating ? 'Creating...' : 'Create' }}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-      <div class="tw:modal-backdrop" @click="showCreateModal = false" />
-    </div>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>

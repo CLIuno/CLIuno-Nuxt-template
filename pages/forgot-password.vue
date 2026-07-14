@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { CircleAlertIcon, CircleCheckIcon, Loader2Icon, RocketIcon } from '@lucide/vue'
 
 definePageMeta({ layout: false, middleware: 'guest' })
 
@@ -25,54 +25,56 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="tw:min-h-screen tw:flex tw:items-center tw:justify-center tw:bg-base-200 tw:px-4">
-    <div class="tw:card tw:w-full tw:max-w-md tw:bg-base-100 tw:shadow-xl">
-      <div class="tw:card-body tw:p-8">
-        <div class="tw:flex tw:items-center tw:justify-center tw:gap-2 tw:mb-2">
-          <Icon icon="mdi:rocket-launch-outline" class="tw:w-8 tw:h-8 tw:text-primary" />
-          <span class="tw:text-2xl tw:font-bold tw:text-primary">CLIuno</span>
-        </div>
+  <div class="flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
+    <Card class="w-full max-w-sm">
+      <CardHeader class="text-center">
+        <NuxtLink to="/" class="mb-2 flex items-center justify-center gap-2 font-bold">
+          <RocketIcon class="size-6" />
+          <span class="text-xl">CLIuno</span>
+        </NuxtLink>
+        <CardTitle class="text-xl">Forgot Password</CardTitle>
+        <CardDescription>Enter your email to receive a reset link</CardDescription>
+      </CardHeader>
 
-        <h2 class="tw:text-2xl tw:font-bold tw:text-center tw:mb-1">Forgot Password</h2>
-        <p class="tw:text-center tw:text-base-content/60 tw:mb-6">
-          Enter your email to receive a reset link
-        </p>
+      <CardContent class="space-y-4">
+        <Alert v-if="success">
+          <CircleCheckIcon />
+          <AlertTitle>Reset link sent!</AlertTitle>
+          <AlertDescription>Check your email.</AlertDescription>
+        </Alert>
 
-        <div v-if="success" class="tw:alert tw:alert-success tw:mb-4">
-          <Icon icon="mdi:check-circle" class="tw:w-5 tw:h-5" />
-          <span>Reset link sent! Check your email.</span>
-        </div>
+        <Alert v-if="error" variant="destructive">
+          <CircleAlertIcon />
+          <AlertTitle>{{ error }}</AlertTitle>
+        </Alert>
 
-        <div v-if="error" class="tw:alert tw:alert-error tw:mb-4">
-          <Icon icon="mdi:alert-circle" class="tw:w-5 tw:h-5" />
-          <span>{{ error }}</span>
-        </div>
+        <form v-if="!success" class="space-y-4" @submit.prevent="handleSubmit">
+          <div class="space-y-2">
+            <Label for="forgot-email">Email Address</Label>
+            <Input
+              id="forgot-email"
+              v-model="email"
+              type="email"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
 
-        <form v-if="!success" class="tw:space-y-4" @submit.prevent="handleSubmit">
-          <fieldset class="tw:fieldset">
-            <legend class="tw:fieldset-legend">Email Address</legend>
-            <div class="tw:input tw:w-full">
-              <Icon icon="mdi:email-outline" class="tw:h-[1em] tw:opacity-50" />
-              <input
-                id="forgot-email"
-                v-model="email"
-                type="email"
-                placeholder="Enter your email"
-                class="tw:grow"
-                required
-              />
-            </div>
-          </fieldset>
-
-          <button type="submit" class="tw:btn tw:btn-primary tw:w-full" :disabled="loading">
+          <Button type="submit" class="w-full" :disabled="loading">
+            <Loader2Icon v-if="loading" class="size-4 animate-spin" />
             {{ loading ? 'Sending...' : 'Send Reset Link' }}
-          </button>
+          </Button>
         </form>
+      </CardContent>
 
-        <div class="tw:text-center tw:mt-4">
-          <NuxtLink to="/login" class="tw:link tw:link-primary"> Back to Sign In </NuxtLink>
-        </div>
-      </div>
-    </div>
+      <CardFooter class="justify-center text-sm text-muted-foreground">
+        <NuxtLink
+          to="/login"
+          class="font-medium text-foreground underline-offset-4 hover:underline"
+        >
+          Back to Sign In
+        </NuxtLink>
+      </CardFooter>
+    </Card>
   </div>
 </template>

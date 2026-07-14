@@ -1,7 +1,7 @@
 <template>
-  <footer class="tw:footer tw:footer-center tw:p-4 tw:bg-base-200 tw:text-base-content">
-    <div>
-      <p>&copy; {{ new Date().getFullYear() }} — Built with 💖 using Nuxt</p>
+  <footer class="border-t py-6">
+    <div class="container mx-auto px-4 text-center text-sm text-muted-foreground">
+      &copy; {{ new Date().getFullYear() }} CLIuno — Built with Nuxt
     </div>
   </footer>
 </template>
