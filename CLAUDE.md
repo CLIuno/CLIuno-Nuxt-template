@@ -35,4 +35,6 @@ Keep all URLs inside the composables.
 
 - oxc tooling: `oxlint` + `oxfmt` (`semi: false`, single quotes; `.prettierrc` matches);
   prettier only for css/md/json. No `@nuxt/eslint` — don't re-add it to `nuxt.config`.
-- Conventional commits (commitlint + husky); Tailwind v4 + daisyUI with `tw:` prefix.
+- Conventional commits (commitlint + husky); Tailwind v4 + **shadcn-vue (shadcn-nuxt,
+  reka-ui primitives)** in `components/ui/`, css-variable theme, dark mode = `.dark`
+  class; add with `npx shadcn-vue@latest add <name>`.
