@@ -28,7 +28,7 @@ interface Post {
   id: string
   title: string
   content: string
-  imageUrl: string
+  image_url?: string | null
   is_paid: boolean
   createdAt: string
   user: { id: string; username: string; first_name: string; last_name: string }
@@ -151,6 +151,12 @@ onMounted(fetchPost)
                 <p v-if="post.content" class="mt-3 text-muted-foreground">
                   {{ post.content }}
                 </p>
+                <img
+                  v-if="post.image_url"
+                  :src="post.image_url"
+                  :alt="post.title"
+                  class="mt-3 max-h-96 w-full rounded-md border object-cover"
+                />
               </div>
               <div v-if="post.user.id === authStore.user?.id" class="flex shrink-0 gap-2">
                 <Button variant="outline" size="icon-sm" aria-label="Edit post" @click="startEdit">
@@ -236,6 +242,11 @@ onMounted(fetchPost)
           <div v-else class="space-y-4">
             <div v-for="comment in post.comments" :key="comment.id" class="flex gap-3">
               <Avatar size="sm">
+                <AvatarImage
+                  v-if="comment.user.avatar_url"
+                  :src="comment.user.avatar_url"
+                  :alt="comment.user.username"
+                />
                 <AvatarFallback
                   >{{ comment.user.first_name[0] }}{{ comment.user.last_name[0] }}</AvatarFallback
                 >

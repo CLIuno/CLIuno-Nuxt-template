@@ -14,6 +14,7 @@ interface User {
   first_name: string
   last_name: string
   email: string
+  avatar_url?: string | null
 }
 
 const user = ref<User | null>(null)
@@ -23,6 +24,24 @@ const following = ref<User[]>([])
 const isFollowing = ref(false)
 
 const isOwnProfile = computed(() => authStore.user?.id === user.value?.id)
+const { uploading, uploadError, uploadImage } = useImageUpload()
+const avatarInput = ref<HTMLInputElement | null>(null)
+
+async function onAvatarPicked(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  const url = await uploadImage(file)
+  if (url) {
+    await userApi.updateCurrentUser({ avatar_url: url })
+    await authStore.fetchCurrentUser()
+    if (user.value) user.value = { ...user.value, avatar_url: url }
+  }
+
+  // reset so re-picking the same file still fires change
+  input.value = ''
+}
 
 async function loadProfile() {
   loading.value = true
@@ -87,13 +106,35 @@ onMounted(loadProfile)
 
         <CardContent class="px-6 pb-6">
           <div class="-mt-12 flex flex-col items-center gap-4 sm:flex-row sm:items-end">
-            <Avatar class="size-24 text-2xl ring-4 ring-background">
-              <AvatarFallback>{{ user.first_name[0] }}{{ user.last_name[0] }}</AvatarFallback>
-            </Avatar>
+            <div class="flex flex-col items-center gap-2">
+              <Avatar class="size-24 text-2xl ring-4 ring-background">
+                <AvatarImage v-if="user.avatar_url" :src="user.avatar_url" :alt="user.username" />
+                <AvatarFallback>{{ user.first_name[0] }}{{ user.last_name[0] }}</AvatarFallback>
+              </Avatar>
+
+              <template v-if="isOwnProfile">
+                <input
+                  ref="avatarInput"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  class="hidden"
+                  @change="onAvatarPicked"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  :disabled="uploading"
+                  @click="avatarInput?.click()"
+                >
+                  {{ uploading ? 'Uploading…' : 'Change photo' }}
+                </Button>
+              </template>
+            </div>
 
             <div class="flex-1 text-center sm:text-left">
               <h1 class="text-2xl font-bold">{{ user.first_name }} {{ user.last_name }}</h1>
               <p class="text-muted-foreground">@{{ user.username }}</p>
+              <p v-if="uploadError" class="mt-1 text-sm text-destructive">{{ uploadError }}</p>
             </div>
 
             <!-- Follow Button -->
@@ -134,6 +175,7 @@ onMounted(loadProfile)
               class="flex items-center gap-2 rounded-full bg-muted px-3 py-1 transition-colors hover:bg-accent"
             >
               <Avatar size="sm">
+                <AvatarImage v-if="f.avatar_url" :src="f.avatar_url" :alt="f.username" />
                 <AvatarFallback>{{ f.first_name[0] }}</AvatarFallback>
               </Avatar>
               <span class="text-sm">{{ f.username }}</span>
@@ -154,6 +196,7 @@ onMounted(loadProfile)
               class="flex items-center gap-2 rounded-full bg-muted px-3 py-1 transition-colors hover:bg-accent"
             >
               <Avatar size="sm">
+                <AvatarImage v-if="f.avatar_url" :src="f.avatar_url" :alt="f.username" />
                 <AvatarFallback>{{ f.first_name[0] }}</AvatarFallback>
               </Avatar>
               <span class="text-sm">{{ f.username }}</span>

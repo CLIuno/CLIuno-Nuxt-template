@@ -10,6 +10,7 @@ const followApi = useFollowApi()
 interface User {
   id: string
   username: string
+  avatar_url?: string | null
   first_name: string
   last_name: string
   email: string
@@ -76,6 +77,7 @@ onMounted(fetchUsers)
       <Card v-for="user in users" :key="user.id" class="py-4">
         <CardContent class="flex flex-row items-center gap-4 px-4">
           <Avatar size="lg">
+            <AvatarImage v-if="user.avatar_url" :src="user.avatar_url" :alt="user.username" />
             <AvatarFallback>{{ user.first_name[0] }}{{ user.last_name[0] }}</AvatarFallback>
           </Avatar>
 

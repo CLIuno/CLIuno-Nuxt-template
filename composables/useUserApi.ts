@@ -2,6 +2,8 @@ export function useUserApi() {
   const http = useHttp()
   return {
     getCurrentUser: () => http.get('/users/current'),
+    updateCurrentUser: (userData: Record<string, unknown>) =>
+      http.patch('/users/current', userData),
     getUsers: () => http.get('/users'),
     getUserByUsername: (username: string) => http.get(`/users/username/${username}`),
     getUserById: (id: string) => http.get(`/users/${id}`),

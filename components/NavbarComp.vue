@@ -69,6 +69,11 @@ const initials = computed(() => {
             <DropdownMenuTrigger as-child>
               <Button variant="ghost" size="sm" class="gap-2 px-1.5">
                 <Avatar size="sm">
+                  <AvatarImage
+                    v-if="authStore.user?.avatar_url"
+                    :src="authStore.user.avatar_url"
+                    :alt="initials"
+                  />
                   <AvatarFallback>{{ initials }}</AvatarFallback>
                 </Avatar>
                 <span class="hidden sm:inline">{{ authStore.user?.username }}</span>
