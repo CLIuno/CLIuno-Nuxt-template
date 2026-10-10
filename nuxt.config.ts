@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2026-10-01',
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
 
@@ -10,7 +10,7 @@ export default defineNuxtConfig({
     /** Prefix for all the imported components */
     prefix: '',
     /** Directory that the components live in */
-    componentDir: './components/ui',
+    componentDir: './app/components/ui',
   },
 
   vite: {

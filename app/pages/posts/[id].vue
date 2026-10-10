@@ -21,7 +21,13 @@ interface Comment {
   id: string
   content: string
   createdAt: string
-  user: { id: string; username: string; first_name: string; last_name: string }
+  user: {
+    id: string
+    username: string
+    first_name: string
+    last_name: string
+    avatar_url?: string | null
+  }
 }
 
 interface Post {
@@ -31,7 +37,13 @@ interface Post {
   image_url?: string | null
   is_paid: boolean
   createdAt: string
-  user: { id: string; username: string; first_name: string; last_name: string }
+  user: {
+    id: string
+    username: string
+    first_name: string
+    last_name: string
+    avatar_url?: string | null
+  }
   comments: Comment[]
 }
 
