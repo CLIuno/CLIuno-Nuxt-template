@@ -19,14 +19,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
 
       - name: Lint and build
-        run: pnpm lint && pnpm build
+        run: pnpm lint && pnpm typecheck && pnpm build
 
       # - name: Create Release Pull Request
       #   id: changesets
